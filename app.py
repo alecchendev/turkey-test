@@ -1,5 +1,9 @@
 import os
+import random
 from flask import Flask, request, send_from_directory
+from transformers import pipeline, set_seed
+
+generator = pipeline('text-generation', model='gpt2')
 
 app = Flask(__name__, static_folder='app/build')
 
@@ -16,7 +20,11 @@ def serve(path):
 def query_model():
     args = request.args
     query = args.get('q')
-    return "[Response to {query}]".format(query=query)
+
+    set_seed(random.randint(0, 1000000))
+    response = generator(query, max_length=50, num_return_sequences=1)
+
+    return response[0]['generated_text'].replace(query, '', 1)
 
 
 if __name__ == '__main__':
