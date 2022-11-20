@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, send_from_directory
+from flask import Flask, request, send_from_directory
 
 app = Flask(__name__, static_folder='app/build')
 
@@ -16,9 +16,7 @@ def serve(path):
 def query_model():
     args = request.args
     query = args.get('q')
-    return "<p>{query}</p>".format(query=query)
-
-
+    return "[Response to {query}]".format(query=query)
 
 
 if __name__ == '__main__':
