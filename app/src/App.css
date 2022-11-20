@@ -1,0 +1,80 @@
+
+.App {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+  width: 100%;
+}
+/*we used flexbox to position chat messages to the bottom of chat window
+but flexbox dont allow overflow scroll out of the box
+*/
+.chat-window {
+  width: 400px;
+  height: 200px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin-bottom: 10px;
+
+  overflow-y: auto;
+}
+.box .inner {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  align-items: flex-end;
+  flex-basis: 100%;
+  height: 100%;
+  align-content: flex-end;
+
+  /* min-height: min-content; handles overflow scroll for flex
+  https://stackoverflow.com/questions/21515042/scrolling-a-flexbox-with-overflowing-content
+  */
+  min-height: min-content;
+}
+.box .inner .message {
+  /* background-color: #eee; */
+  border: 1px solid #ccc;
+  padding: 2px 4px;
+  margin: 2px;
+  display: flex;
+  flex-direction: row;
+  flex-basis: 100%;
+}
+.box .reference {
+  display: flex;
+  flex-direction: row;
+  flex-basis: 100%;
+}
+input {
+  color: inherit;
+  border-radius: 3px;
+  width: 90%;
+  padding: 10px;
+  box-shadow: none;
+  background: none;
+  border: 1px solid #ccc;
+}
+
+.chat-composer form {
+  width: 400px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.chat-composer button {
+  background-color: transparent;
+  color: inherit;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}

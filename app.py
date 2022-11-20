@@ -1,13 +1,25 @@
-from flask import Flask, request
+import os
+from flask import Flask, request, render_template, send_from_directory
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='app/build')
 
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
+# Serve React App
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
 @app.get('/api/v0/query')
-def login_get():
+def query_model():
     args = request.args
     query = args.get('q')
     return "<p>{query}</p>".format(query=query)
+
+
+
+
+if __name__ == '__main__':
+    app.run(use_reloader=True, port=5000, threaded=True)
