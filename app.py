@@ -1,11 +1,13 @@
 import os
 import random
 from flask import Flask, request, send_from_directory
+from flask_cors import CORS
 from transformers import pipeline, set_seed
 
 generator = pipeline('text-generation', model='gpt2')
 
 app = Flask(__name__, static_folder='app/build')
+CORS(app) # Enable CORS
 
 # Serve React App
 @app.route('/', defaults={'path': ''})
@@ -16,6 +18,7 @@ def serve(path):
     else:
         return send_from_directory(app.static_folder, 'index.html')
 
+# Endpoint for querying the model
 @app.get('/api/v0/query')
 def query_model():
     args = request.args

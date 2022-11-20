@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 function ChatComposer({ submitted }) {
   const [ newMessage, setNewMessage ] = useState("");

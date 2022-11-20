@@ -1,5 +1,5 @@
 import './App.css';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import ChatWindow from "./ChatWindow";
 import ChatComposer from "./ChatComposer";
 import axios from 'axios';
@@ -13,17 +13,9 @@ function App() {
     { text: "Second stored message" }
   ]);
 
-  // // function to make request to api and append the response to messages
-  // const submitted = async (message) => {
-  //   const response = await axios.post(`${api}/query?q=${message}`);
-  //   const { data } = response;
-  //   setMessages([...messages, { text: data.message }]);
-  // };
-
   const submitted = async (getNewMessage) => {
     if (getNewMessage !== "") {
-      // match the state format
-      // const newMessage = { text: getNewMessage };
+      // get response from server
       const newMessageRes = await axios.get(`${api}/query?q=${getNewMessage}`);
       const newMessage = { text: newMessageRes.data};
       // merge new message in copy of state stored messages
