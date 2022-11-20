@@ -50,6 +50,7 @@ but flexbox dont allow overflow scroll out of the box
   display: flex;
   flex-direction: row;
   flex-basis: 100%;
+  text-align: left;
 }
 .box .reference {
   display: flex;
