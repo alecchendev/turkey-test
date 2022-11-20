@@ -49,6 +49,7 @@ def main():
     CREATE TABLE IF NOT EXISTS games (
         id integer PRIMARY KEY,
         token text NOT NULL,
+        type text NOT NULL,
         start_time timestamp default (strftime('%s', 'now')) NOT NULL,
         queries integer default 0 NOT NULL
     );
