@@ -1,7 +1,7 @@
-import './App.css';
+import './styles/App.css';
 import { useState } from 'react';
-import ChatWindow from "./ChatWindow";
-import ChatComposer from "./ChatComposer";
+import ChatWindow from "./components/ChatWindow";
+import ChatComposer from "./components/ChatComposer";
 import axios from 'axios';
 
 const api = "http://localhost:5000/api/v0";
