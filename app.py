@@ -91,7 +91,7 @@ def query_model():
     return response[0]['generated_text'].replace(query, '', 1)
 
 # Endpoint for creating a new game
-@app.get('/api/v0/new_game')
+@app.post('/api/v0/new_game')
 def new_game():
 
     # Create new game
@@ -130,7 +130,7 @@ def get_scoreboard(name):
         return 'Scoreboard does not exist', 400
 
 # Endpoint to submit evaluation for a game
-@app.get('/api/v0/evaluate')
+@app.post('/api/v0/evaluate')
 def evaluate():
     # Get token
     args = request.args

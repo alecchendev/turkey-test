@@ -1,41 +1,29 @@
-import './styles/App.css';
-import { useState } from 'react';
-import ChatWindow from "./components/ChatWindow";
-import ChatComposer from "./components/ChatComposer";
-import axios from 'axios';
+import Home from "./pages/Home";
+import Game from "./pages/Game";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Route,
+} from "react-router-dom";
+import "./styles/App.css";
 
-const api = "http://localhost:5000/api/v0";
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/game",
+    element: <Game />,
+  },
+]);
 
 function App() {
 
-  const [ messages, setMessages ] = useState([
-    { text: "First stored message" },
-    { text: "Second stored message" }
-  ]);
-
-  const submitted = async (getNewMessage) => {
-    if (getNewMessage !== "") {
-      // add query message
-      let updatedMessages = [...messages, { text: getNewMessage }];
-      setMessages(updatedMessages);
-      // get response from server
-      const newMessageRes = await axios.get(`${api}/query?q=${getNewMessage}`);
-      const newMessage = { text: newMessageRes.data};
-      // merge new message in copy of state stored messages
-      updatedMessages = [...updatedMessages, newMessage];
-      // update state
-      setMessages(updatedMessages);
-    }
-  };
-
   return (
-    <div className="App">
-      <h1>Title</h1>
-      <ChatWindow messagesList={messages} />
-      <ChatComposer submitted={submitted} />
-    </div>
+    <RouterProvider router={router} />
   );
+
 }
 
 export default App;
-
