@@ -8,18 +8,21 @@ const api = "http://localhost:5000/api/v0";
 
 function App() {
 
-  const [ messages, setMessages] = useState([
+  const [ messages, setMessages ] = useState([
     { text: "First stored message" },
     { text: "Second stored message" }
   ]);
 
   const submitted = async (getNewMessage) => {
     if (getNewMessage !== "") {
+      // add query message
+      let updatedMessages = [...messages, { text: getNewMessage }];
+      setMessages(updatedMessages);
       // get response from server
       const newMessageRes = await axios.get(`${api}/query?q=${getNewMessage}`);
       const newMessage = { text: newMessageRes.data};
       // merge new message in copy of state stored messages
-      const updatedMessages = [...messages, newMessage];
+      updatedMessages = [...updatedMessages, newMessage];
       // update state
       setMessages(updatedMessages);
     }
