@@ -158,13 +158,13 @@ def evaluate():
     
     # Update scoreboard 'basic' depending if evaluation matches type of game
     scoreboard = Scoreboard.query.filter_by(name='basic').first()
-    if evaluation == game.type and evaluation == 'ai':
+    if evaluation == game.type and game.type == 'ai':
         scoreboard.ai_right += 1
-    elif evaluation == game.type and evaluation == 'human':
+    elif evaluation == game.type and game.type == 'human':
         scoreboard.human_right += 1
-    elif evaluation != game.type and evaluation == 'ai':
+    elif evaluation != game.type and game.type == 'ai':
         scoreboard.ai_wrong += 1
-    elif evaluation != game.type and evaluation == 'human':
+    elif evaluation != game.type and game.type == 'human':
         scoreboard.human_wrong += 1
     db.session.commit()
     

@@ -2,8 +2,7 @@ import '../styles/App.css';
 import { useEffect, useState } from 'react';
 import ChatWindow from "../components/ChatWindow";
 import ChatComposer from "../components/ChatComposer";
-import axios from 'axios';
-import { createGame, queryModel } from '../api/api';
+import { createGame, evaluate, queryModel } from '../api/api';
 
 const api = "http://localhost:5000/api/v0";
 
@@ -26,6 +25,12 @@ function Game() {
     }
   };
 
+  const submitEvaluation = async (evaluation) => {
+    console.log("submitting evaluation");
+    const evaluationRes = await evaluate(evaluation);
+    console.log(evaluationRes);
+  }
+
   useEffect(() => {
     (async () => {
       const res = await createGame();
@@ -37,9 +42,12 @@ function Game() {
 
   return (
     <div className="App">
-      <h1>Title</h1>
       <ChatWindow messagesList={messages} />
       <ChatComposer submitted={submitted} />
+      <div className='eval-box'>
+        <button onClick={async () => { await submitEvaluation("ai")}}>AI</button>
+        <button onClick={async () => { await submitEvaluation("human")}}>Human</button>
+      </div>
     </div>
   );
 }

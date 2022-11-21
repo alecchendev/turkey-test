@@ -58,13 +58,18 @@ but flexbox dont allow overflow scroll out of the box
   flex-basis: 100%;
 }
 input {
+  font-size: 1rem;
   color: inherit;
   border-radius: 3px;
-  width: 90%;
+  width: 75%;
   padding: 10px;
   box-shadow: none;
   background: none;
   border: 1px solid #ccc;
+}
+
+input:focus {
+  outline: none;
 }
 
 .chat-composer form {
@@ -78,4 +83,32 @@ input {
   color: inherit;
   border: 1px solid #ccc;
   border-radius: 3px;
+  margin-right: 0;
+}
+
+button {
+  background-color: #282c34;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 15px;
+}
+
+button:hover {
+  background-color: white;
+  color: #282c34;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.eval-box {
+  margin-top: 10px;
+  width: 400px;
+  display: flex;
+  justify-content: space-between;
+}
+.eval-box * {
+  width: 48%;
 }
