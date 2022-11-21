@@ -26,7 +26,7 @@ function Home() {
   return (
     <div className="App">
       <Scoreboard {...scoreboard} />
-      <Link to="/game"><button>Start Game</button></Link>
+      <Link to="/game"><button className="clickable-btn">Start Game</button></Link>
     </div>
   );
 }

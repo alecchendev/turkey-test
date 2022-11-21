@@ -172,7 +172,7 @@ def evaluate():
     db.session.commit()
 
     # Return response
-    return ''
+    return game.type
 
 
 if __name__ == '__main__':
