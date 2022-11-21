@@ -57,6 +57,7 @@ but flexbox dont allow overflow scroll out of the box
   flex-direction: row;
   flex-basis: 100%;
 }
+
 input {
   font-size: 1rem;
   color: inherit;
@@ -78,17 +79,14 @@ input:focus {
   flex-direction: row;
   justify-content: space-between;
 }
+
 .chat-composer button {
-  background-color: transparent;
-  color: inherit;
-  border: 1px solid #ccc;
-  border-radius: 3px;
   margin-right: 0;
 }
 
 button {
   background-color: #282c34;
-  color: white;
+  color: #ccc;
   font-weight: bold;
   font-size: 1rem;
   border: 1px solid #ccc;
@@ -115,6 +113,26 @@ button:hover {
 
 .back-btn {
   margin-top: 75px;
+}
+
+.disabled-btn {
+  background-color: transparent;
+  color: #ccc;
+  border: 1px solid #ccc;
+  opacity: 0.5;
+}
+
+.disabled-input {
+  background-color: transparent;
+  color: #ccc;
+  border: 1px solid #ccc;
+  opacity: 0.5;
+}
+
+.disabled-btn:hover {
+  background-color: transparent;
+  color: #ccc;
+  cursor: not-allowed;
 }
 
 table {
