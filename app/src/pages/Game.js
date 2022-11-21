@@ -94,7 +94,10 @@ function Game() {
             <button className={results === 'human' ? 'correct-btn' : 'incorrect-btn'}>Human</button>
           </div>
         )}
-      <Link to="/"><button className='back-btn clickable-btn' >Back to Scoreboard</button></Link>
+      <div className="bottom-btn-box" >
+        {submitted && <button className='clickable-btn' onClick={() => window.location.reload(false)}>New Game</button>}
+        <Link to="/"><button className='clickable-btn' >Back to Scoreboard</button></Link>
+      </div>
     </div>
   );
 }

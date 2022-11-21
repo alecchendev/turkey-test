@@ -135,8 +135,15 @@ button {
   width: 48%;
 }
 
-.back-btn {
-  margin-top: 75px;
+.bottom-btn-box {
+  min-height: 125px;
+  width: 200px;
+  margin-top: 60px;
+}
+
+.bottom-btn-box button {
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 .correct-btn {
