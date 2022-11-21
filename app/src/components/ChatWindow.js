@@ -12,11 +12,22 @@ function ChatWindow({ messagesList }) {
       <div className="box">
         <div className="inner">
           {Array.isArray(messagesList) &&
-            messagesList.map((oneMessage, index) => (
-              <p key={index} className="message">
-                {oneMessage.text}
-              </p>
-            ))}
+            messagesList.map((oneMessage, index) => { 
+              if (oneMessage.type === "query") {
+                return (
+                  <div className="message q" key={index}>
+                    <div className="message-text query">{oneMessage.text}</div>
+                  </div>
+                );
+              } else if (oneMessage.type === "response") {
+                return (
+                  <div className="message" key={index}>
+                    <div className="message-text response">{oneMessage.text}</div>
+                  </div>
+                );
+              }
+              return null;
+            })}
           <div
             id="message-list-end"
             className="reference"

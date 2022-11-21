@@ -20,7 +20,7 @@ but flexbox dont allow overflow scroll out of the box
 */
 .chat-window {
   width: 400px;
-  height: 200px;
+  height: 250px;
   border: 1px solid #ccc;
   border-radius: 3px;
   margin-bottom: 10px;
@@ -36,6 +36,7 @@ but flexbox dont allow overflow scroll out of the box
   flex-basis: 100%;
   height: 100%;
   align-content: flex-end;
+  padding: 8px;
 
   /* min-height: min-content; handles overflow scroll for flex
   https://stackoverflow.com/questions/21515042/scrolling-a-flexbox-with-overflowing-content
@@ -43,14 +44,37 @@ but flexbox dont allow overflow scroll out of the box
   min-height: min-content;
 }
 .box .inner .message {
-  /* background-color: #eee; */
-  border: 1px solid #ccc;
-  padding: 2px 4px;
-  margin: 2px;
+  /* border: 1px solid #ccc; */
   display: flex;
   flex-direction: row;
   flex-basis: 100%;
   text-align: left;
+}
+
+.box .inner .q {
+  flex-direction: row-reverse;
+}
+
+.box .inner .message .message-text {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  border-radius: 20px;
+  font-size: 1rem;
+  padding: 5px 12px;
+  margin: 3px 0px;
+  max-width: 75%;
+  width: fit-content;
+}
+
+.box .inner .message .query {
+  background-color: #3b414f;
+  border: 1px solid #3b414f;
+  color: white;
+  float: right;
+}
+.box .inner .message .response {
+  background-color: #ccc;
+  border: 1px solid #ccc;
+  color: #282c34;
 }
 .box .reference {
   display: flex;

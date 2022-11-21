@@ -23,13 +23,13 @@ function Game() {
 
     // display query message
     setGettingQuery(true);
-    let updatedMessages = [...messages, { text: getNewMessage }];
+    let updatedMessages = [...messages, { text: getNewMessage, type: "query" }];
     setMessages(updatedMessages);
 
     // get response from server
     try {
       const response = await queryModel(getNewMessage);
-      updatedMessages = [...updatedMessages, { text: response }];
+      updatedMessages = [...updatedMessages, { text: response, type: "response" }];
       setMessages(updatedMessages);
       setQueries(queries + 1);
       setGettingQuery(false);
