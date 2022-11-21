@@ -112,3 +112,17 @@ button:hover {
 .eval-box * {
   width: 48%;
 }
+
+table {
+  width: 500px;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+  margin: 25px;
+}
+
+th, td {
+  /* font-weight: normal; */
+  font-size: 1.2rem;
+  border: 1px solid #ccc;
+  padding: 25px;
+}

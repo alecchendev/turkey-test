@@ -4,8 +4,6 @@ import ChatWindow from "../components/ChatWindow";
 import ChatComposer from "../components/ChatComposer";
 import { createGame, evaluate, queryModel } from '../api/api';
 
-const api = "http://localhost:5000/api/v0";
-
 function Game() {
 
   const [ messages, setMessages ] = useState([]);
@@ -26,9 +24,7 @@ function Game() {
   };
 
   const submitEvaluation = async (evaluation) => {
-    console.log("submitting evaluation");
     const evaluationRes = await evaluate(evaluation);
-    console.log(evaluationRes);
   }
 
   useEffect(() => {
@@ -36,6 +32,8 @@ function Game() {
       const res = await createGame();
       if (res == null) {
         console.log("Error creating game");
+      } else {
+        console.log("Game created");
       }
     })();
   }, []);

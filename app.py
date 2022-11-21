@@ -59,7 +59,7 @@ def serve(path):
         return send_from_directory(app.static_folder, 'index.html')
 
 # Endpoint for querying the model
-@app.get('/api/v0/query')
+@app.post('/api/v0/query')
 def query_model():
     # Get http only cookie from request
     token = request.cookies.get('token')

@@ -20,7 +20,7 @@ export const createGame = async () => {
 // function to make a query
 export const queryModel = async (q) => {
   try {
-    const res = await axios.get(`${api}${queryRoute}?q=${q}`);
+    const res = await axios.post(`${api}${queryRoute}?q=${q}`);
     return res.data;
   } catch (err) {
     console.log(err);
