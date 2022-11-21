@@ -1,5 +1,6 @@
 import '../styles/App.css';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import ChatWindow from "../components/ChatWindow";
 import ChatComposer from "../components/ChatComposer";
 import { createGame, evaluate, queryModel } from '../api/api';
@@ -25,6 +26,7 @@ function Game() {
 
   const submitEvaluation = async (evaluation) => {
     const evaluationRes = await evaluate(evaluation);
+    console.log("Sent: " + evaluation);
   }
 
   useEffect(() => {
@@ -46,6 +48,7 @@ function Game() {
         <button onClick={async () => { await submitEvaluation("ai")}}>AI</button>
         <button onClick={async () => { await submitEvaluation("human")}}>Human</button>
       </div>
+      <Link to="/"><button className='back-btn'>Back to Scoreboard</button></Link>
     </div>
   );
 }

@@ -113,6 +113,10 @@ button:hover {
   width: 48%;
 }
 
+.back-btn {
+  margin-top: 75px;
+}
+
 table {
   width: 500px;
   border-collapse: collapse;
