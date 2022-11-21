@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+import sys
 
 def create_connection(db_file):
     """ create a database connection to the SQLite database
@@ -43,7 +44,11 @@ def insert_table(conn, insert_sql):
         print(e)
 
 def main():
-    database = "./database/database.db"
+    if len(sys.argv) != 3 or sys.argv[1] != 'init':
+        print("Usage: python3 database.py init <database file>")
+        return
+
+    database = sys.argv[2]
 
     sql_create_games_table = """
     CREATE TABLE IF NOT EXISTS games (
