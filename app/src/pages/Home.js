@@ -16,9 +16,11 @@ function Home() {
 
   useEffect(() => {
     (async () => {
-      const scoreboardRes = await getScoreboard("basic");
-      if (scoreboardRes) {
-        setScoreboard(scoreboardRes);
+      try {
+        const response = await getScoreboard("basic");
+        setScoreboard(response);
+      } catch (err) {
+        console.log(err);
       }
     })();
   }, []);

@@ -37,15 +37,8 @@ function Game() {
 
     // get response from server
     try {
-      const query = updatedMessages.map((message) => {
-        let prefix = null;
-        if (message.type === "query") prefix = "A: ";
-        else if (message.type === "response") prefix = "B: ";
-        return message.text;
-      }).join("\n\n");
-      console.log(query);
+      const query = updatedMessages.map((message) => message.text).join("\n\n");
       const response = await queryModel(token, query);
-      console.log(response);
       updatedMessages = [...updatedMessages, { text: response.trim(), type: "response" }];
       setMessages(updatedMessages);
       setQueries(queries + 1);
@@ -102,7 +95,7 @@ function Game() {
       <div className="game-container">
         <ChatWindow messagesList={messages} />
         <div className='input-container'>
-          <ChatComposer submitted={submitQuery} canQuery={canQuery()} maxLength={maxLength} />
+          <ChatComposer submitted={submitQuery} canQuery={canQuery()} gameCreated={!gameCreated} maxLength={maxLength} />
             {results == null ? (
               <div className='eval-box'>
                 <Button disabled={!canEvaluate()} onClick={async () => { await submitEvaluation("ai")}} >AI</Button>
