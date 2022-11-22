@@ -5,6 +5,10 @@ import secrets
 from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 
+import os
+import openai
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 from transformers import pipeline, set_seed
 
 from flask_sqlalchemy import SQLAlchemy
@@ -79,15 +83,25 @@ def query_model():
     query = args.get('q')
 
     # Generate response
-    set_seed(random.randint(0, 1000000))
-    response = generator(query, max_length=50, num_return_sequences=1)
+    # set_seed(random.randint(0, 1000000))
+    # response = generator(query, max_length=50, num_return_sequences=1)
+    res = openai.Completion.create(
+        model="text-ada-001",
+        prompt=query,
+        max_tokens=50, # openai reccomends 150 for chat
+        temperature=0.9, # openai reccomends 0.9 for chat
+        top_p=1, # openai reccomends 1 for chat
+    )
+    response = res['choices'][0]['text']
+
 
     # Update queries in game
     game.queries += 1
     db.session.commit()
 
     # Return response
-    return response[0]['generated_text'].replace(query, '', 1)
+    # return response[0]['generated_text'].replace(query, '', 1)
+    return response
 
 # Endpoint for creating a new game
 @app.post('/api/v0/new_game')

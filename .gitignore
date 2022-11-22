@@ -4,3 +4,4 @@ __pycache__/
 database/
 instance/
 .DS_Store
+.env
