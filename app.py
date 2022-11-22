@@ -53,6 +53,16 @@ class Scoreboard(db.Model):
 
     def __repr__(self):
         return '<Scoreboard %r>' % self.name
+    
+    # return scoreboard as dict
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'ai_right': self.ai_right,
+            'ai_wrong': self.ai_wrong,
+            'human_right': self.human_right,
+            'human_wrong': self.human_wrong
+        }
 
 # Serve React App
 @app.route('/', defaults={'path': ''})
@@ -73,13 +83,7 @@ def get_scoreboard(name):
     if scoreboard is None:
         return 'Scoreboard does not exist', 400
     
-    return {
-        'name': scoreboard.name,
-        'ai_right': scoreboard.ai_right,
-        'ai_wrong': scoreboard.ai_wrong,
-        'human_right': scoreboard.human_right,
-        'human_wrong': scoreboard.human_wrong
-    }
+    return scoreboard.to_dict()
 
 
 # Endpoint for creating a new game
@@ -89,23 +93,25 @@ def new_game():
     # Create new game
     token = secrets.token_hex(16)
     type = "ai" # or human
-    game = Game(token=token, type=type)
-    db.session.add(game)
-    db.session.commit()
+    add_new_game(db, token, type)
 
     # Return token
     return token
 
+def add_new_game(db, token, type):
+    game = Game(token=token, type=type)
+    db.session.add(game)
+    db.session.commit()
+
 # Endpoint for querying the model
 @app.post('/api/v0/query')
 def query_model():
-    # Get http only cookie from request
-    # token = request.cookies.get('token')
+    # Get token
     args = request.args
     token = args.get('token')
 
     # Get game from database
-    game = Game.query.filter_by(token=token).first()
+    game = get_game_from_token(token)
 
     # Reject request if game does not exist
     if game is None:
@@ -119,17 +125,7 @@ def query_model():
     query = args.get('q')
 
     # Generate response
-    # set_seed(random.randint(0, 1000000))
-    response = generator(query, max_length=50, num_return_sequences=1)
-    response = response[0]['generated_text'].replace(query, '', 1)
-    # res = openai.Completion.create(
-    #     model="text-ada-001",
-    #     prompt=query,
-    #     max_tokens=50, # openai reccomends 150 for chat
-    #     temperature=0.9, # openai reccomends 0.9 for chat
-    #     top_p=1, # openai reccomends 1 for chat
-    # )
-    # response = res['choices'][0]['text']
+    response = generate_response(query)
 
     # Update queries in game
     game.queries += 1
@@ -138,16 +134,36 @@ def query_model():
     # Return response
     return response
 
+def get_game_from_token(token):
+    game = Game.query.filter_by(token=token).first()
+    return game
+
+def generate_response(query):
+    # gpt2
+    set_seed(random.randint(0, 1000000))
+    response = generator(query, max_length=50, num_return_sequences=1)
+    response = response[0]['generated_text'].replace(query, '', 1)
+
+    # gpt3 ada
+    # res = openai.Completion.create(
+    #     model="text-ada-001",
+    #     prompt=query,
+    #     max_tokens=50, # openai reccomends 150 for chat
+    #     temperature=0.9, # openai reccomends 0.9 for chat
+    #     top_p=1, # openai reccomends 1 for chat
+    # )
+    # response = res['choices'][0]['text']
+    return response
+
 # Endpoint to submit evaluation for a game
 @app.post('/api/v0/evaluate')
 def evaluate():
     # Get token
     args = request.args
     token = args.get('token')
-    # token = request.cookies.get('token')
 
     # Get game from database
-    game = Game.query.filter_by(token=token).first()
+    game = get_game_from_token(token)
 
     # Reject request if game does not exist
     if game is None:
@@ -155,36 +171,40 @@ def evaluate():
 
     # Reject request if game has less than 1 query
     if game.queries < 1:
-        return {
-            'error': 'Game has less than 1 query'
-        }
+        return 'Must query once before evaluating', 400
     
     # Reject request if evaluation not equal to "ai" or "human"
     evaluation = args.get('e')
     if evaluation != 'ai' and evaluation != 'human':
-        return {
-            'error': 'Evaluation must be "ai" or "human"'
-        }
+        return 'Evaluation must be "ai" or "human"', 400
     
     # Update scoreboard 'basic' depending if evaluation matches type of game
-    scoreboard = Scoreboard.query.filter_by(name='basic').first()
-    if evaluation == game.type and game.type == 'ai':
-        scoreboard.ai_right += 1
-    elif evaluation == game.type and game.type == 'human':
-        scoreboard.human_right += 1
-    elif evaluation != game.type and game.type == 'ai':
-        scoreboard.ai_wrong += 1
-    elif evaluation != game.type and game.type == 'human':
-        scoreboard.human_wrong += 1
-    db.session.commit()
+    update_scoreboard(db, 'basic', evaluation, game.type)
     
     # Delete game from database
-    db.session.delete(game)
-    db.session.commit()
+    delete_game(db, game)
 
     # Return response
     return game.type
 
+def update_scoreboard(db, scoreboard_name, evaluation, game_type):
+    correct = evaluation == game_type
+    is_ai = game_type == 'ai'
+    is_human = game_type == 'human'
+    scoreboard = Scoreboard.query.filter_by(name=scoreboard_name).first()
+    if correct and is_ai:
+        scoreboard.ai_right += 1
+    elif correct and is_human:
+        scoreboard.human_right += 1
+    elif not correct and is_ai:
+        scoreboard.ai_wrong += 1
+    elif not correct and is_human:
+        scoreboard.human_wrong += 1
+    db.session.commit()
+
+def delete_game(db, game):
+    db.session.delete(game)
+    db.session.commit()
 
 if __name__ == '__main__':
     app.run(use_reloader=True, port=5000, threaded=True)
