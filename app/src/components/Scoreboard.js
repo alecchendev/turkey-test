@@ -3,18 +3,29 @@ function Scoreboard({ ai_right, ai_wrong, human_right, human_wrong }) {
 
   return (
     <div className="Scoreboard">
-      <h2>Scoreboard</h2>
+      <h2>Results</h2>
       <table>
         <tr>
-          <th>AI Classified Correctly</th>
-          <th>AI Classified Incorrectly</th>
-          <th>Human Classified Correctly</th>
-          <th>Human Classified Incorrectly</th>
+          <th>Responder</th>
+          <th>Identified</th>
+          <th>Score</th>
         </tr>
         <tr>
+          <td rowspan="2">AI</td>
+          <td>Correctly</td>
           <td>{ai_right}</td>
+        </tr>
+        <tr>
+          <td>Incorrectly</td>
           <td>{ai_wrong}</td>
+        </tr>
+        <tr>
+          <td rowspan="2">Human</td>
+          <td>Correctly</td>
           <td>{human_right}</td>
+        </tr>
+        <tr>
+          <td>Incorrectly</td>
           <td>{human_wrong}</td>
         </tr>
       </table>

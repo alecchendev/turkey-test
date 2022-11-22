@@ -81,19 +81,22 @@ function Game() {
         }}
         />
       </div>
-      <ChatWindow messagesList={messages} />
-      <ChatComposer submitted={submitQuery} canQuery={canQuery()} />
-        {results == null ? (
-          <div className='eval-box'>
-            <Button disabled={!canEvaluate()} onClick={async () => { await submitEvaluation("ai")}} >AI</Button>
-            <Button disabled={!canEvaluate()} onClick={async () => { await submitEvaluation("human")}} >Human</Button>
-          </div>
-        ) : (
-          <div className='eval-box'>
-            <button className={results === 'ai' ? 'correct-btn' : 'incorrect-btn'}>AI</button>
-            <button className={results === 'human' ? 'correct-btn' : 'incorrect-btn'}>Human</button>
-          </div>
-        )}
+      <div className="game-container">
+        <ChatWindow messagesList={messages} />
+        <ChatComposer submitted={submitQuery} canQuery={canQuery()} />
+          {results == null ? (
+            <div className='eval-box'>
+              <Button disabled={!canEvaluate()} onClick={async () => { await submitEvaluation("ai")}} >AI</Button>
+              <Button disabled={!canEvaluate()} onClick={async () => { await submitEvaluation("human")}} >Human</Button>
+            </div>
+          ) : (
+            <div className='eval-box'>
+              <button className={results === 'ai' ? 'correct-btn' : 'incorrect-btn'}>AI</button>
+              <button className={results === 'human' ? 'correct-btn' : 'incorrect-btn'}>Human</button>
+            </div>
+          )}
+      </div>
+
       <div className="bottom-btn-box" >
         {submitted && <button className='clickable-btn' onClick={() => window.location.reload(false)}>New Game</button>}
         <Link to="/"><button className='clickable-btn' >Back to Scoreboard</button></Link>

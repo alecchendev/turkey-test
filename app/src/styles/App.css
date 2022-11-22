@@ -1,25 +1,46 @@
 
 .App {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  /* font-size: calc(10px + 2vmin); */
   color: white;
+  text-align: center;
+  max-width: 725px;
+  width: 95%;
+  margin: auto;
+  padding-top: 80px;
+  padding-bottom: 50px;
 }
 
-.App {
-  font-family: sans-serif;
-  text-align: center;
-  width: 100%;
+h1 {
+  font-size: 3.5rem;
+  margin-bottom: 25px;
 }
+
+p {
+  font-size: 1.1rem;
+  text-align: left;
+  margin: 5px 0;
+}
+
+.start-btn {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+.game-container {
+  margin: auto;
+  margin-top: 50px;
+  width: 100%;
+  max-width: 400px;
+}
+
 /*we used flexbox to position chat messages to the bottom of chat window
 but flexbox dont allow overflow scroll out of the box
 */
 .chat-window {
-  width: 400px;
+  width: 100%;
   height: 250px;
   border: 1px solid #ccc;
   border-radius: 3px;
@@ -97,15 +118,19 @@ input:focus {
   outline: none;
 }
 
+.chat-composer {
+  width: 100%;
+}
+
 .chat-composer form {
-  width: 400px;
+  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
 
 .chat-composer button {
-  margin-right: 0;
+  margin-left: 8px;
 }
 
 button {
@@ -127,7 +152,7 @@ button {
 
 .eval-box {
   margin-top: 10px;
-  width: 400px;
+  width: 100%;
   display: flex;
   justify-content: space-between;
 }
@@ -186,15 +211,13 @@ button {
 }
 
 table {
-  width: 500px;
   border-collapse: collapse;
   border: 1px solid #ccc;
-  margin: 25px;
 }
 
 th, td {
   /* font-weight: normal; */
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   border: 1px solid #ccc;
-  padding: 25px;
+  padding: 15px;
 }

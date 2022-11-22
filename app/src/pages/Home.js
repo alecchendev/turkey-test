@@ -25,8 +25,15 @@ function Home() {
 
   return (
     <div className="App">
+      <h1>Laughing Hand</h1>
+      <p>
+        Hey there! Welcome to Laughing Hand (WIP), a game where you
+        get to ask 3 questions to see if you can guess whether you're talking to
+        an AI or a human! In theory, this website is meant to crowdsource turing
+        tests for open source ML models.
+      </p>
+      <Link to="/game"><button className="start-btn clickable-btn">Start Game</button></Link>
       <Scoreboard {...scoreboard} />
-      <Link to="/game"><button className="clickable-btn">Start Game</button></Link>
     </div>
   );
 }
