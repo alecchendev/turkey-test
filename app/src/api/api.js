@@ -20,9 +20,9 @@ export const createGame = async () => {
 }
 
 // function to make a query
-export const queryModel = async (q) => {
+export const queryModel = async (token, q) => {
   try {
-    const res = await axios.post(`${api}${queryRoute}?q=${q}`);
+    const res = await axios.post(`${api}${queryRoute}?q=${q}&token=${token}`);
     return res.data;
   } catch (err) {
     throw err;
@@ -30,9 +30,9 @@ export const queryModel = async (q) => {
 }
 
 // function to evaluate game
-export const evaluate = async (evaluation) => {
+export const evaluate = async (token, evaluation) => {
   try {
-    const res = await axios.post(`${api}${evaluateRoute}?e=${evaluation}`);
+    const res = await axios.post(`${api}${evaluateRoute}?e=${evaluation}&token=${token}`);
     return res.data;
   } catch (err) {
     throw err;

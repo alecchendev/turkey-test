@@ -11,6 +11,7 @@ import toast, { Toaster } from 'react-hot-toast';
 function Game() {
 
   const [ gameCreated, setGameCreated ] = useState(false);
+  const [ token, setToken ] = useState(null);
   const [ messages, setMessages ] = useState([]);
   const [ gettingQuery, setGettingQuery ] = useState(false);
   const [ queries, setQueries ] = useState(0);
@@ -28,7 +29,7 @@ function Game() {
 
     // get response from server
     try {
-      const response = await queryModel(getNewMessage);
+      const response = await queryModel(token, getNewMessage);
       updatedMessages = [...updatedMessages, { text: response, type: "response" }];
       setMessages(updatedMessages);
       setQueries(queries + 1);
@@ -48,7 +49,7 @@ function Game() {
 
     setSubmitted(true);
     try {
-      const evaluateRes = await evaluate(evaluation);
+      const evaluateRes = await evaluate(token, evaluation);
       setResults(evaluateRes);
       if (evaluation === evaluateRes) {
         toast.success("Correct!");
@@ -65,6 +66,7 @@ function Game() {
     (async () => {
       try {
         const gameRes = await createGame();
+        setToken(gameRes);
         setGameCreated(true);
       } catch (err) {
         console.log(err);
