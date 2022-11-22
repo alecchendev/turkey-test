@@ -26,6 +26,6 @@ generator = pipeline('text-generation', model='gpt2')
 def generate_response_transformer(query):
     # gpt2
     set_seed(random.randint(0, 1000000))
-    response = generator(query, max_length=50, num_return_sequences=1)
+    response = generator(query, max_new_tokens=50, num_return_sequences=1)
     response = response[0]['generated_text'].replace(query, '', 1)
     return response

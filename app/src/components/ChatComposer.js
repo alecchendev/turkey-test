@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Button from "./Button";
 
-function ChatComposer({ submitted, canQuery }) {
+function ChatComposer({ submitted, canQuery, maxLength }) {
   const [ newMessage, setNewMessage ] = useState("");
 
   const handleChange = (event) => {
@@ -24,6 +24,7 @@ function ChatComposer({ submitted, canQuery }) {
           value={newMessage}
           disabled={!canQuery}
           className={canQuery ? "" : "disabled-input"}
+          maxLength={maxLength}
         />
         <Button type="submit" disabled={!canQuery}>Send</Button>
       </form>

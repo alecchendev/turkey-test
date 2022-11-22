@@ -7,6 +7,7 @@ import Button from '../components/Button';
 import { createGame, evaluate, queryModel } from '../api/api';
 import toast, { Toaster } from 'react-hot-toast';
 
+const maxLength = 280;
 
 function Game() {
 
@@ -20,7 +21,14 @@ function Game() {
 
   const submitQuery = async (getNewMessage) => {
     if (!canQuery()) return;
-    if (getNewMessage === "") return;
+    if (getNewMessage === "" || getNewMessage.length > maxLength) return;
+
+    // Input sanitization
+    getNewMessage = getNewMessage.trim();
+    // add punctuation to getNewMessage if it doesn't have any
+    if (!getNewMessage.endsWith(".") && !getNewMessage.endsWith("?") && !getNewMessage.endsWith("!")) {
+      getNewMessage += ".";
+    }
 
     // display query message
     setGettingQuery(true);
@@ -29,8 +37,16 @@ function Game() {
 
     // get response from server
     try {
-      const response = await queryModel(token, getNewMessage);
-      updatedMessages = [...updatedMessages, { text: response, type: "response" }];
+      const query = updatedMessages.map((message) => {
+        let prefix = null;
+        if (message.type === "query") prefix = "A: ";
+        else if (message.type === "response") prefix = "B: ";
+        return message.text;
+      }).join("\n\n");
+      console.log(query);
+      const response = await queryModel(token, query);
+      console.log(response);
+      updatedMessages = [...updatedMessages, { text: response.trim(), type: "response" }];
       setMessages(updatedMessages);
       setQueries(queries + 1);
       setGettingQuery(false);
@@ -86,7 +102,7 @@ function Game() {
       <div className="game-container">
         <ChatWindow messagesList={messages} />
         <div className='input-container'>
-          <ChatComposer submitted={submitQuery} canQuery={canQuery()} />
+          <ChatComposer submitted={submitQuery} canQuery={canQuery()} maxLength={maxLength} />
             {results == null ? (
               <div className='eval-box'>
                 <Button disabled={!canEvaluate()} onClick={async () => { await submitEvaluation("ai")}} >AI</Button>
