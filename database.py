@@ -1,97 +1,77 @@
-import sqlite3
-from sqlite3 import Error
-import sys
+from flask_sqlalchemy import SQLAlchemy
+import time
 
-def create_connection(db_file):
-    """ create a database connection to the SQLite database
-        specified by db_file
-    :param db_file: database file
-    :return: Connection object or None
-    """
-    conn = None
-    try:
-        conn = sqlite3.connect(db_file)
-        return conn
-    except Error as e:
-        print(e)
+db = SQLAlchemy()
 
-    return conn
+# SQLAlchemy models
+class Game(db.Model):
+    __tablename__ = 'games'
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(32), unique=True, nullable=False)
+    type = db.Column(db.String(32), nullable=False)
+    start_time = db.Column(db.Integer, nullable=False, default=int(time.time()))
+    queries = db.Column(db.Integer, nullable=False, default=0)
 
+    def __repr__(self):
+        return '<Game %r>' % self.token
 
-def create_table(conn, create_table_sql):
-    """ create a table from the create_table_sql statement
-    :param conn: Connection object
-    :param create_table_sql: a CREATE TABLE statement
-    :return:
-    """
-    try:
-        c = conn.cursor()
-        c.execute(create_table_sql)
-    except Error as e:
-        print(e)
+class Scoreboard(db.Model):
+    __tablename__ = 'scoreboard'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(32), nullable=False)
+    ai_right = db.Column(db.Integer, nullable=False, default=0)
+    ai_wrong = db.Column(db.Integer, nullable=False, default=0)
+    human_right = db.Column(db.Integer, nullable=False, default=0)
+    human_wrong = db.Column(db.Integer, nullable=False, default=0)
 
-def insert_table(conn, insert_sql):
-    """ insert a row into a table
-    :param conn: Connection object
-    :param insert_sql: a INSERT INTO statement
-    :return:
-    """
-    try:
-        c = conn.cursor()
-        c.execute(insert_sql)
-        conn.commit()
-    except Error as e:
-        print(e)
+    def __repr__(self):
+        return '<Scoreboard %r>' % self.name
+    
+    # return scoreboard as dict
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'ai_right': self.ai_right,
+            'ai_wrong': self.ai_wrong,
+            'human_right': self.human_right,
+            'human_wrong': self.human_wrong
+        }
 
-def main():
-    if len(sys.argv) != 3 or sys.argv[1] != 'init':
-        print("Usage: python3 database.py init <database file>")
-        return
+# Helper functions for db operations
 
-    database = sys.argv[2]
+def get_scoreboard(name):
+    return Scoreboard.query.filter_by(name=name).first()
 
-    sql_create_games_table = """
-    CREATE TABLE IF NOT EXISTS games (
-        id integer PRIMARY KEY,
-        token text NOT NULL,
-        type text NOT NULL,
-        start_time timestamp default (strftime('%s', 'now')) NOT NULL,
-        queries integer default 0 NOT NULL
-    );
-    """
+def add_new_game(db, token, type):
+    game = Game(token=token, type=type)
+    db.session.add(game)
+    db.session.commit()
 
-    sql_create_scoreboard_table = """
-    CREATE TABLE IF NOT EXISTS scoreboard (
-        id integer PRIMARY KEY,
-        name text NOT NULL,
-        ai_right integer default 0 NOT NULL,
-        ai_wrong integer default 0 NOT NULL,
-        human_right integer default 0 NOT NULL,
-        human_wrong integer default 0 NOT NULL
-    );
-    """
+def get_game(token):
+    game = Game.query.filter_by(token=token).first()
+    return game
 
-    insert_basic_sql = """
-    INSERT INTO scoreboard(name) VALUES('basic')
-    """
+def increment_queries(db, game):
+    game.queries += 1
+    db.session.commit()
 
-    # create a database connection
-    conn = create_connection(database)
+def update_scoreboard(db, scoreboard_name, evaluation, game_type):
+    correct = evaluation == game_type
+    is_ai = game_type == 'ai'
+    is_human = game_type == 'human'
+    scoreboard = Scoreboard.query.filter_by(name=scoreboard_name).first()
 
-    # create tables
-    if conn is not None:
-        # create games table
-        create_table(conn, sql_create_games_table)
+    if correct and is_ai:
+        scoreboard.ai_right += 1
+    elif correct and is_human:
+        scoreboard.human_right += 1
+    elif not correct and is_ai:
+        scoreboard.ai_wrong += 1
+    elif not correct and is_human:
+        scoreboard.human_wrong += 1
+    
+    db.session.commit()
 
-        # create scoreboard table
-        create_table(conn, sql_create_scoreboard_table)
-
-        # insert one row to scoreboard
-        insert_table(conn, insert_basic_sql)
-
-    else:
-        print("Error! cannot create the database connection.")
-
-
-if __name__ == '__main__':
-    main()
+def delete_game(db, game):
+    db.session.delete(game)
+    db.session.commit()
