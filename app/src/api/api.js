@@ -10,9 +10,9 @@ const scoreboardRoute = "/scoreboard";
 // the structure in case of change.
 
 // function to create a new game
-export const createGame = async () => {
+export const createGame = async (role) => {
   try {
-    const res = await axios.post(`${api}${newGameRoute}`);
+    const res = await axios.post(`${api}${newGameRoute}/${role}`);
     return res.data;
   } catch (err) {
     throw err;

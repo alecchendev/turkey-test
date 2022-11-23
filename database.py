@@ -11,6 +11,9 @@ class Game(db.Model):
     type = db.Column(db.String(32), nullable=False)
     start_time = db.Column(db.Integer, nullable=False, default=int(time.time()))
     queries = db.Column(db.Integer, nullable=False, default=0)
+    responses = db.Column(db.Integer, nullable=False, default=0)
+    has_investigator = db.Column(db.Boolean, nullable=False, default=False)
+    has_responder = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return '<Game %r>' % self.token
@@ -42,8 +45,8 @@ class Scoreboard(db.Model):
 def get_scoreboard(name):
     return Scoreboard.query.filter_by(name=name).first()
 
-def add_new_game(db, token, type):
-    game = Game(token=token, type=type)
+def add_new_game(db, token, type, has_responder, has_investigator):
+    game = Game(token=token, type=type, has_responder=has_responder, has_investigator=has_investigator)
     db.session.add(game)
     db.session.commit()
 
@@ -53,6 +56,10 @@ def get_game(token):
 
 def increment_queries(db, game):
     game.queries += 1
+    db.session.commit()
+
+def increment_responses(db, game):
+    game.responses += 1
     db.session.commit()
 
 def update_scoreboard(db, scoreboard_name, evaluation, game_type):

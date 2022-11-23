@@ -24,6 +24,12 @@ p {
   margin: 5px 0;
 }
 
+.role-btn-box {
+  display: flex;
+  width: 350px;
+  justify-content: space-between;
+}
+
 .start-btn {
   margin-top: 25px;
   margin-bottom: 10px;

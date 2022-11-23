@@ -34,7 +34,10 @@ function Home() {
         an AI or a human! In theory, this website is meant to crowdsource turing
         tests for open source ML models.
       </p>
-      <Link to="/game"><button className="start-btn clickable-btn">Start Game</button></Link>
+      <div className="role-btn-box">
+        <Link to="/game/investigator"><button className="start-btn clickable-btn">Play Investigator</button></Link>
+        <Link to="/game/responder"><button className="start-btn clickable-btn">Play Responder</button></Link>
+      </div>
       <Scoreboard {...scoreboard} />
     </div>
   );
