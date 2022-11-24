@@ -27,13 +27,21 @@ function Home() {
 
   return (
     <div className="App">
-      <h1>Laughing Hand</h1>
+      <h1>🦃 Turkey Test</h1>
       <p>
-        Hey there! Welcome to Laughing Hand (WIP), a game where you
-        get to ask 3 questions to see if you can guess whether you're talking to
-        an AI or a human! In theory, this website is meant to crowdsource turing
-        tests for open source ML models.
+        Hey there! Welcome to Turkey Test, a game where you can play as an
+        investigator or a responder.
       </p>
+      <p> 
+        As an investigator, you're matched up randomly with either an AI or a
+        human responder, and you're allowed to ask 3 questions before guessing
+        which one you're talking to. As a responder you answer the
+        investigator's questions however you would like.
+      </p>
+      <p>
+        In theory, this website is meant to crowdsource turing tests for language models.
+      </p>
+
       <div className="role-btn-box">
         <Link to="/game/investigator"><button className="start-btn clickable-btn">Play Investigator</button></Link>
         <Link to="/game/responder"><button className="start-btn clickable-btn">Play Responder</button></Link>
