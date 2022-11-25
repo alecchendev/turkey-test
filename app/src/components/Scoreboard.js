@@ -1,9 +1,9 @@
 
-function Scoreboard({ ai_right, ai_wrong, human_right, human_wrong }) {
+function Scoreboard({ ai_right, ai_wrong, human_right, human_wrong, title }) {
 
   return (
     <div className="Scoreboard">
-      <h2>Results</h2>
+      <h2>{title}</h2>
       <table>
         <thead>
           <tr>

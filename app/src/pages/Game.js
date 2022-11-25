@@ -6,11 +6,13 @@ import ChatComposer from "../components/ChatComposer";
 import Button from '../components/Button';
 import { socket } from '../api/api';
 import toast, { Toaster } from 'react-hot-toast';
+import { useCookies } from 'react-cookie';
 
 const maxLength = 280;
 
 function Game() {
 
+  const [ cookies, setCookies ] = useCookies(['user']);
   const { role } = useParams();
   const responder = role === 'responder';
   const investigator = role === 'investigator';
@@ -87,6 +89,55 @@ function Game() {
     }
   }
 
+  const saveResults = (data) => {
+    console.log('saving result')
+    let stats = cookies.stats;
+    if (stats === undefined) {
+      stats = {
+        responder: {
+          fooled: 0,
+          helped: 0,
+        },
+        investigator: {
+          ai_right: 0,
+          ai_wrong: 0,
+          human_right: 0,
+          human_wrong: 0,
+        }
+      };
+      setCookies('stats', stats, { path: '/' });
+    }
+
+    console.log(stats);
+    const correct = data.evaluation === data.results;
+    if (responder) {
+      if (correct === true) {
+        stats.responder.helped += 1;
+      }
+      else {
+        stats.responder.fooled += 1;
+      }
+    }
+    if (investigator) {
+      if (data.evaluation === "ai") {
+        if (correct === true) {
+          stats.investigator.ai_right += 1;
+        }
+        else {
+          stats.investigator.ai_wrong += 1;
+        }
+      } else {
+        if (correct === true) {
+          stats.investigator.human_right += 1;
+        }
+        else {
+          stats.investigator.human_wrong += 1;
+        }
+      }
+    }
+    setCookies('stats', stats, { path: '/' });
+  }
+
   useEffect(() => {
     (async () => {
       try {
@@ -124,6 +175,9 @@ function Game() {
               toast.error("Incorrect!");
             }
           }
+
+          saveResults(data);
+
         });
 
         // Join game
@@ -196,8 +250,13 @@ function Game() {
       </div>
       {/* <button className="clickable-btn" onClick={sendSocketMessage}>Send Socket Message</button> */}
       <div className="bottom-btn-box" >
-        {submitted && <button className='clickable-btn' onClick={() => window.location.reload(false)}>New Game</button>}
-        <Link to="/"><button className='clickable-btn' >Back to Scoreboard</button></Link>
+        {submitted &&
+        <>
+          <button className='clickable-btn' onClick={() => window.location.reload(false)}>New Game</button>
+          <Link to="/stats"><button className='clickable-btn' >See your Stats</button></Link>
+        </>
+        }
+        <Link to="/"><button className='clickable-btn' >Back to Home</button></Link>
       </div>
     </div>
   );

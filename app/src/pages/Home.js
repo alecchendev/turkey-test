@@ -4,8 +4,11 @@ import {
 } from "react-router-dom";
 import Scoreboard from "../components/Scoreboard";
 import {getScoreboard, socket} from "../api/api";
+import { useCookies } from "react-cookie";
 
 function Home() {
+
+  const [ cookies ] = useCookies(['user']);
 
   const [ scoreboard, setScoreboard ] = useState({
     ai_right: 0,
@@ -48,7 +51,8 @@ function Home() {
         <Link to="/game/investigator"><button className="start-btn clickable-btn">Play Investigator</button></Link>
         <Link to="/game/responder"><button className="start-btn clickable-btn">Play Responder</button></Link>
       </div>
-      <Scoreboard {...scoreboard} />
+      {cookies.stats && <Link to="/stats"><button className='clickable-btn' >See your Stats</button></Link>}
+      <Scoreboard {...scoreboard} title={'Results'}/>
     </div>
   );
 }

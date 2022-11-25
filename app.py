@@ -109,7 +109,7 @@ def on_message(data):
         if response == '' or response[-1] in ['.', '?', '!']:
             response += "."
         min_response_time = 2
-        response_length_time = len(response.split()) / (65 / 60) # words / (avg words per second)
+        response_length_time = len(response.split()) / (80 / 60) # words / (avg words per second)
         response_time_variance = random.randint(-3, 3)
         wait_time = max(0, min_response_time + response_length_time + response_time_variance)
         time.sleep(wait_time)
