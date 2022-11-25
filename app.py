@@ -184,11 +184,13 @@ def new_game(role):
         add_new_game(db, token, game_type, responder_id, investigator_id)
         return token
     
-    # role == 'investigator':
+    # investigator
     game_type = "ai"
     responder_id = 'ai'
     investigator_id = request.sid
     add_new_game(db, token, game_type, responder_id, investigator_id)
+    # Wait at least a second
+    time.sleep(random.randint(1, 4))
     return token
 
 def create_token():
