@@ -30,17 +30,12 @@ function Home() {
     <div className="App">
       <h1>🦃 Turkey Test</h1>
       <p>
-        Hey there! Welcome to Turkey Test, a game where you can play as an
-        investigator or a responder.
-      </p>
-      <p> 
-        As an investigator, you're matched up randomly with either an AI or a
-        human responder, and you're allowed to ask 3 questions before guessing
-        which one you're talking to. As a responder you answer the
-        investigator's questions however you would like.
+        Hey there! Welcome to Turkey Test!
       </p>
       <p>
-        In theory, this website is meant to crowdsource turing tests for language models.
+        Ask up to 3 questions to decide whether you're talking to an AI or a human.
+        Or play the human on the other side, answering questions in order to help or fool your
+        fellow human.
       </p>
 
       <div className="role-btn-box">

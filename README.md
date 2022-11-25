@@ -25,7 +25,7 @@ Nevertheless, a thought.
 **Install and Run**
 1. Clone the respository
 ```
-git clone <repo>
+git clone https://github.com/alecchendev/turkey-test.git
 ```
 2. Activate your virtual environment (or don't) and install the Python dependencies from `requirements.txt`
 ```
