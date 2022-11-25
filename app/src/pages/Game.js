@@ -89,6 +89,24 @@ function Game() {
     }
   }
 
+  const shareConversation = () => {
+    // copy to clipboard
+    const header = "🦃 Turkey Test\n"
+    const convo = messages.map((message) => {
+      if (message.type === "query") {
+        return "1: " + message.text;
+      } else if (message.type === "response") {
+        return "2: " + message.text;
+      } else {
+        return message.text;
+      }
+    }).join("\n");
+    navigator.clipboard.writeText(header + convo);
+
+    // display toast
+    toast.success("Copied to clipboard!");
+  }
+
   const saveResults = (data) => {
     console.log('saving result')
     let stats = cookies.stats;
@@ -248,12 +266,12 @@ function Game() {
           }
         </div>
       </div>
-      {/* <button className="clickable-btn" onClick={sendSocketMessage}>Send Socket Message</button> */}
       <div className="bottom-btn-box" >
         {submitted &&
         <>
+          <button className='clickable-btn' onClick={shareConversation}>Share Conversation</button>
           <button className='clickable-btn' onClick={() => window.location.reload(false)}>New Game</button>
-          <Link to="/stats"><button className='clickable-btn' >See your Stats</button></Link>
+          {/* <Link to="/stats"><button className='clickable-btn' >See your Stats</button></Link> */}
         </>
         }
         <Link to="/"><button className='clickable-btn' >Back to Home</button></Link>
