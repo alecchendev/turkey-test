@@ -25,8 +25,14 @@ function ChatWindow({ messagesList }) {
                     <div className="message-text response">{oneMessage.text}</div>
                   </div>
                 );
+              } else if (oneMessage.type === "disconnect") {
+                return (
+                  <div className="message d" key={index}>
+                    <div className="message-text disconnect"><i>{oneMessage.text}</i></div>
+                  </div>
+                );
               }
-              return null;
+              return <div>asdfasdfasdf</div>;
             })}
           <div
             id="message-list-end"

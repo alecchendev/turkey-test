@@ -104,6 +104,31 @@ def on_message(data):
         emit('message', {'text': response, 'type': 'response'}, room=token)
         increment_responses(db, get_game(token=token))
 
+# Handler evaluation
+@socketio.on('evaluate')
+def on_evaluation(data):
+    token = data['token']
+    evaluation = data['evaluation']
+    game = get_game(token=token)
+    print("HANDLING EVALUATE\n\n\n")
+
+    # Reject request if game does not exist
+    if game is None:
+        emit('evaluate', {'error': 'Game does not exist'})
+        return
+    
+    # Reject request if evaluation is not valid
+    if evaluation not in ['ai', 'human']:
+        emit('evaluate', {'error': 'Evaluation must be "ai" or "human"'}, room=token)
+    
+    # Update score
+    update_scoreboard(db, 'basic', evaluation, game.type)
+    results = game.type
+
+    # Delete game
+    delete_game(db, game)
+
+    emit('evaluate', { 'evaluation': evaluation, 'results': results }, room=token)
 
 # Serve React App
 @app.route('/', defaults={'path': ''})

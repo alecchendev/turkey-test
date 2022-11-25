@@ -57,18 +57,16 @@ function Game() {
     if (!canEvaluate()) return;
 
     setSubmitted(true);
-    try {
-      const evaluateRes = await evaluate(token, evaluation);
-      setResults(evaluateRes);
-      if (evaluation === evaluateRes) {
-        toast.success("Correct!");
-      } else {
-        toast.error("Incorrect!");
-      }
-    } catch (err) {
-      console.log(err);
-      setSubmitted(false);
-    }
+    socket.emit('evaluate', { token: token, evaluation: evaluation });
+    console.log("submitted evaluation");
+  }
+
+  const handleDisconnect = (messages, data) => {
+    console.log('disconnect', data);
+    const updatedMessages = [...messages, { text: "Other player disconnected.", type: "disconnect" }];
+    setMessages(updatedMessages);
+    setSubmitted(true);
+    setResults("disconnected");
   }
 
   const handleMessage = (messages, data) => {
@@ -96,9 +94,7 @@ function Game() {
         socket.on('connect', function() {
           console.log('connected');
         });
-        socket.on('disconnect', function(data) {
-          console.log('disconnect', data);
-        });
+        socket.on('disconnect', (data) => handleDisconnect(messages, data));
         socket.on('join', function(data) {
           console.log('join', data);
           const { token, gotMatch } = data;
@@ -110,6 +106,23 @@ function Game() {
           console.log('leave', data);
         });
         socket.on('message', (data) => handleMessage(messages, data));
+        socket.on('evaluate', function(data) {
+          console.log(data);
+          if (data.error) {
+            console.log(data.error);
+            setSubmitted(false);
+            return;
+          }
+          setSubmitted(true);
+          setResults(data);
+          if (investigator) {
+            if (data.evaluation === data.results) {
+              toast.success("Correct!");
+            } else {
+              toast.error("Incorrect!");
+            }
+          }
+        });
 
         // Join game
         // socket.emit('join', { token: gameRes })
@@ -123,6 +136,7 @@ function Game() {
           socket.off('join');
           socket.off('leave');
           socket.off('message');
+          socket.off('evaluate');
         };
 
       } catch (err) {
@@ -136,6 +150,7 @@ function Game() {
   useEffect(() => {
     if (socket) {
       socket.on('message', (data) => handleMessage(messages, data));
+      socket.on('disconnect', (data) => handleDisconnect(messages, data));
     }
   }, [messages]);
 
@@ -151,7 +166,7 @@ function Game() {
       {!matched &&
         <>
           <p className="finding-match">Finding match...</p>
-          <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+          <div className="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
         </>
       }
       <div className="game-container">
@@ -159,7 +174,7 @@ function Game() {
         <div className='input-container'>
           <ChatComposer submitted={submitMessage} canQuery={canQuery()} matched={matched} maxLength={maxLength} />
           {
-            investigator &&
+            investigator ?
             <div>{results == null ? (
               <div className='eval-box'>
                 <Button disabled={!canEvaluate()} onClick={async () => { await submitEvaluation("ai")}} >AI</Button>
@@ -167,11 +182,13 @@ function Game() {
               </div>
             ) : (
               <div className='eval-box'>
-                <button className={results === 'ai' ? 'correct-btn' : 'incorrect-btn'}>AI</button>
-                <button className={results === 'human' ? 'correct-btn' : 'incorrect-btn'}>Human</button>
+                <button className={results.results === 'ai' ? 'correct-btn' : 'incorrect-btn'}>AI</button>
+                <button className={results.results === 'human' ? 'correct-btn' : 'incorrect-btn'}>Human</button>
               </div>
             )}
             </div>
+            :
+            <p className="investigator-choice">Investigator choice: {results && results.evaluation}</p>
           }
         </div>
       </div>
