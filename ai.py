@@ -6,10 +6,11 @@ import openai
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_response(query):
-    return generate_response_openai(query, 'text-ada-001')
+    # return generate_response_openai(query, 'text-ada-001')
+    return generate_response_openai(query, 'text-davinci-001')
     # return generate_response_transformer(query)
 
-def generate_response_openai(query, model):
+def generate_response_openai(query, model, max_requests=8):
     # gpt3 ada
     res = openai.Completion.create(
         model=model,
@@ -17,7 +18,21 @@ def generate_response_openai(query, model):
         max_tokens=50, # openai reccomends 150 for chat
         temperature=0.9, # openai reccomends 0.9 for chat
         top_p=1, # openai reccomends 1 for chat
+        stop=['\n']
     )
+    # repeat query if finish reason != stop
+    requests = 0
+    while requests < max_requests and (res['choices'][0]['finish_reason'] != 'stop' or res['choices'][0]['text'].strip() == ''):
+        res = openai.Completion.create(
+            model=model,
+            prompt=query,
+            max_tokens=50, # openai reccomends 150 for chat
+            temperature=0.9, # openai reccomends 0.9 for chat
+            top_p=1, # openai reccomends 1 for chat
+            stop=['\n']
+        )
+        requests += 1
+    print("REQUESTS: ", requests)
     response = res['choices'][0]['text']
     return response
 

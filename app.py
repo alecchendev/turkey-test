@@ -1,5 +1,7 @@
 import os
 import secrets
+import time
+import random
 
 from flask import Flask, request, send_from_directory
 from flask_cors import CORS
@@ -10,7 +12,7 @@ from ai import generate_response
 
 # Create app
 app = Flask(__name__, static_folder='app/build')
-CORS(app) # Enable CORS
+CORS(app, resources={r"/*": {"origins": "*"}}) # Enable CORS
 
 # Configure socketio
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -104,6 +106,13 @@ def on_message(data):
     # If ai, must be type == query, generate response
     if game.type == 'ai':
         response = generate_response(message['text']).strip()
+        if response == '' or response[-1] in ['.', '?', '!']:
+            response += "."
+        min_response_time = 2
+        response_length_time = len(response.split()) / (65 / 60) # words / (avg words per second)
+        response_time_variance = random.randint(-3, 3)
+        wait_time = max(0, min_response_time + response_length_time + response_time_variance)
+        time.sleep(wait_time)
         emit('message', {'text': response, 'type': 'response'}, room=token)
         increment_responses(db, get_game(token=token))
 
