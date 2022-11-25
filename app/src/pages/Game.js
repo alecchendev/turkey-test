@@ -192,7 +192,14 @@ function Game() {
             } else {
               toast.error("Incorrect!");
             }
+          } else if (responder === true) {
+            if (data.evaluation === data.results) {
+              toast.success("Helped fellow human!");
+            } else {
+              toast.success("Fooled silly human!");
+            }
           }
+
 
           saveResults(data);
 
