@@ -59,8 +59,8 @@ def main():
         start_time timestamp default (strftime('%s', 'now')) NOT NULL,
         queries integer default 0 NOT NULL,
         responses integer default 0 NOT NULL,
-        has_investigator boolean default 0 NOT NULL,
-        has_responder boolean default 0 NOT NULL
+        investigator_id text default '' NOT NULL,
+        responder_id text default '' NOT NULL
     );
     """
 

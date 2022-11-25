@@ -26,39 +26,84 @@ db.init_app(app)
 
 # Test socketio connection
 @socketio.on('connect')                                                         
-def connect():                                                                  
+def on_connect():                                                                  
     emit('connect')
+
+# Handle message on event 'join'
+@socketio.on('join')
+def on_join(data):
+    role = data['role']
+    token = new_game(role)
+
+    # token = data['token']
+    game = get_game(token=token)
+    if game is None:
+        emit('join', {'error': 'Game does not exist'})
+        return
+    
+    gotMatch = game.investigator_id != '' and game.responder_id != ''
+    
+    join_room(token)
+    emit('join', {'token': token, 'gotMatch': gotMatch }, room=token)
+
+# On disconnect leave room and update database
+@socketio.on('disconnect')
+def on_disconnect():
+    id = request.sid
+    game = get_game(player_id=id)
+
+    if game is None:
+        return
+    
+    token = game.token
+    if game.investigator_id == id:
+        game.investigator_id = 'left'
+        db.session.commit()
+        if game.responder_id in ['', 'left', 'ai']:
+            delete_game(db, game)
+    elif game.responder_id == id:
+        game.responder_id = 'left'
+        db.session.commit()
+        if game.investigator_id in ['', 'left']:
+            delete_game(db, game)
+    
+    leave_room(game.token)
+    emit('disconnect', {'message': 'left room'}, room=token)
+
 
 # Handle message on event 'message'
 @socketio.on('message')
-def handle_message(data):
+def on_message(data):
     token = data['token']
     message = data['message']
     emit('message', message, room=token)
 
-    game = get_game(token)
+    game = get_game(token=token)
+
+    # Reject request if game does not exist
+    if game is None:
+        emit('message', {'error': 'Game does not exist'})
+        return
+    
     if message['type'] == 'query':
+        # Reject request if queries == 3
+        if game.queries == 3:
+            emit('message', {'error': 'You have reached the maximum number of queries'})
+            return
         increment_queries(db, game)
     else:
+        # Reject request if responses == 3
+        if game.responses == 3:
+            emit('message', {'error': 'You have reached the maximum number of responses'})
+            return
         increment_responses(db, game)
 
     # If ai, must be type == query, generate response
     if game.type == 'ai':
         response = generate_response(message['text'])
         emit('message', {'text': response, 'type': 'response'}, room=token)
-        increment_responses(db, get_game(token))
+        increment_responses(db, get_game(token=token))
 
-# Handle message on event 'join'
-@socketio.on('join')
-def on_join(data):
-    token = data['token']
-    game = get_game(token)
-    if game is None:
-        emit('join', {'error': 'Game does not exist'})
-        return
-    
-    join_room(token)
-    emit('join', {'message': 'joined room'}, room=token, broadcast=True)
 
 # Serve React App
 @app.route('/', defaults={'path': ''})
@@ -82,66 +127,36 @@ def get_results(name):
     return scoreboard.to_dict()
 
 # Endpoint for creating a new game
-@app.post('/api/v0/new_game/<role>')
+# @app.post('/api/v0/new_game/<role>')
 def new_game(role):
 
     # Try to join latest game where it's missing your role
-    game = (Game.query.filter_by(has_responder=False).order_by(Game.start_time.desc()).first()
-        if role == 'responder' else Game.query.filter_by(has_investigator=False).order_by(Game.start_time.desc()).first())
+    game = (Game.query.filter_by(responder_id='').order_by(Game.start_time.desc()).first()
+        if role == 'responder' else Game.query.filter_by(investigator_id='').order_by(Game.start_time.desc()).first())
     if game is not None:
-        game.has_responder = True if role == 'responder' else game.has_responder
-        game.has_investigator = True if role == 'investigator' else game.has_investigator
+        game.responder_id = request.sid if role == 'responder' else game.responder_id
+        game.investigator_id = request.sid if role == 'investigator' else game.investigator_id
         db.session.commit()
-        return game.token, 200
+        return game.token
 
     # If can't join game, create new game
     token = create_token()
     if role == 'responder':
         game_type = "human"
-        has_responder = True
-        has_investigator = False
-        add_new_game(db, token, game_type, has_responder, has_investigator)
-        return token, 200
+        responder_id = request.sid
+        investigator_id = ''
+        add_new_game(db, token, game_type, responder_id, investigator_id)
+        return token
     
     # role == 'investigator':
     game_type = "ai"
-    has_responder = True
-    has_investigator = True
-    add_new_game(db, token, game_type, has_responder, has_investigator)
-    return token, 200
+    responder_id = 'ai'
+    investigator_id = request.sid
+    add_new_game(db, token, game_type, responder_id, investigator_id)
+    return token
 
 def create_token():
     return secrets.token_hex(16)
-
-# Endpoint for querying the model
-@app.post('/api/v0/query')
-def query_model():
-    # Get token
-    args = request.args
-    token = args.get('token')
-
-    # Get game from database
-    game = get_game(token)
-
-    # Reject request if game does not exist
-    if game is None:
-        return 'Game does not exist', 400
-    
-    # Reject request if queries == 3
-    if game.queries == 3:
-        return 'Game has ended', 400
-
-    # Get query
-    query = args.get('q')
-
-    # Generate response
-    response = generate_response(query)
-
-    # Update queries in game
-    increment_queries(db, game)
-
-    # Return response
-    return response
 
 
 # Endpoint to submit evaluation for a game
@@ -152,7 +167,7 @@ def evaluate():
     token = args.get('token')
 
     # Get game from database
-    game = get_game(token)
+    game = get_game(token=token)
 
     # Reject request if game does not exist
     if game is None:

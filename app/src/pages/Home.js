@@ -3,7 +3,7 @@ import {
   Link
 } from "react-router-dom";
 import Scoreboard from "../components/Scoreboard";
-import {getScoreboard} from "../api/api";
+import {getScoreboard, socket} from "../api/api";
 
 function Home() {
 
@@ -19,6 +19,7 @@ function Home() {
       try {
         const response = await getScoreboard("basic");
         setScoreboard(response);
+        socket.disconnect();
       } catch (err) {
         console.log(err);
       }

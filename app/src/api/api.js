@@ -1,33 +1,16 @@
 import axios from 'axios';
+import io from 'socket.io-client';
 
+const socketUrl = 'http://localhost:5000';
 const api = "http://localhost:5000/api/v0";
-const newGameRoute = "/new_game";
-const queryRoute = "/query";
 const evaluateRoute = "/evaluate";
 const scoreboardRoute = "/scoreboard";
 
+// Sockets
+export const socket = io.connect(socketUrl);
+
 // Try catch then throwing error is redundant but leaving
 // the structure in case of change.
-
-// function to create a new game
-export const createGame = async (role) => {
-  try {
-    const res = await axios.post(`${api}${newGameRoute}/${role}`);
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
-}
-
-// function to make a query
-export const queryModel = async (token, q) => {
-  try {
-    const res = await axios.post(`${api}${queryRoute}?q=${q}&token=${token}`);
-    return res.data;
-  } catch (err) {
-    throw err;
-  }
-}
 
 // function to evaluate game
 export const evaluate = async (token, evaluation) => {

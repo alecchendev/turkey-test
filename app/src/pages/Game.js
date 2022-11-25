@@ -4,9 +4,8 @@ import '../styles/App.css';
 import ChatWindow from "../components/ChatWindow";
 import ChatComposer from "../components/ChatComposer";
 import Button from '../components/Button';
-import { createGame, evaluate, queryModel } from '../api/api';
+import { evaluate, socket } from '../api/api';
 import toast, { Toaster } from 'react-hot-toast';
-import io from 'socket.io-client';
 
 const maxLength = 280;
 
@@ -20,23 +19,23 @@ function Game() {
 
   const [ gameCreated, setGameCreated ] = useState(false);
   const [ token, setToken ] = useState(null);
-  const [ socket, setSocket ] = useState(null);
+  const [ matched, setMatched ] = useState(false);
   const [ messages, setMessages ] = useState([]);
-  const getMessages = () => messages;
   const [ gettingQuery, setGettingQuery ] = useState(false);
   const [ queries, setQueries ] = useState(0);
+  const [ responses, setResponses ] = useState(0);
   const [ submitted, setSubmitted ] = useState(false);
   const [ results, setResults ] = useState(null);
 
-  const submitQuery = async (getNewMessage) => {
+  const submitMessage = async (message) => {
     if (!canQuery()) return;
-    if (getNewMessage === "" || getNewMessage.length > maxLength) return;
+    if (message === "" || message.length > maxLength) return;
 
     // Input sanitization
-    getNewMessage = getNewMessage.trim();
-    // add punctuation to getNewMessage if it doesn't have any
-    if (!getNewMessage.endsWith(".") && !getNewMessage.endsWith("?") && !getNewMessage.endsWith("!")) {
-      getNewMessage += ".";
+    message = message.trim();
+    // add punctuation to message if it doesn't have any
+    if (!message.endsWith(".") && !message.endsWith("?") && !message.endsWith("!")) {
+      message += ".";
     }
 
     // display query message
@@ -44,28 +43,13 @@ function Game() {
 
     // send to human
     const messageType = responder ? "response" : "query";
-    const message = { text: getNewMessage, type: messageType };
-    socket.emit('message', { token: token, message: message });
-
-    // // send to ai
-    // let updatedMessages = [...messages, { text: getNewMessage, type: "query" }];
-    // setMessages(updatedMessages);
-
-    // // get response from server
-    // try {
-    //   const query = updatedMessages.map((message) => message.text).join("\n\n");
-    //   const response = await queryModel(token, query);
-    //   updatedMessages = [...updatedMessages, { text: response.trim(), type: "response" }];
-    //   setMessages(updatedMessages);
-    //   setQueries(queries + 1);
-    //   setGettingQuery(false);
-    // } catch (err) {
-    //   setGettingQuery(false);
-    //   console.log(err);
-    // }
+    socket.emit('message', { token: token, message: { text: message, type: messageType } });
   };
 
-  const canQuery = () => { return gameCreated && !gettingQuery && queries < 3 && !submitted; };
+  const canQuery = () => {
+    if (responder) return matched && !gettingQuery && queries > 0 && !submitted;
+    if (investigator) return matched && !gettingQuery && queries < 3 && !submitted;
+  };
 
   const canEvaluate = () => { return gameCreated && queries > 0 && !submitted; };
 
@@ -87,11 +71,6 @@ function Game() {
     }
   }
 
-  const sendSocketMessage = () => {
-    // send message to socket
-    socket.emit('message', { message: { text: "asdf", type: "response" }, token: token });
-  }
-
   const handleMessage = (messages, data) => {
     console.log('message', data);
     console.log(messages);
@@ -99,33 +78,44 @@ function Game() {
     setMessages(updatedMessages);
     if (data.type === "query") {
       setQueries(queries + 1);
+      if (role === "responder") {
+        setGettingQuery(false);
+      }
+    } else if (data.type === "response") {
+      setResponses(responses + 1);
+      if (role === "investigator") {
+        setGettingQuery(false);
+      }
     }
-    setGettingQuery(false);
   }
 
   useEffect(() => {
     (async () => {
       try {
-        const gameRes = await createGame(role);
-        setToken(gameRes);
-        setGameCreated(true);
-        console.log(gameRes);
 
-        const socket = io.connect('http://localhost:5000');
+        // Setup socket and handlers
+        socket.connect();
         socket.on('connect', function() {
           console.log('connected');
         });
+        socket.on('disconnect', function(data) {
+          console.log('disconnect', data);
+        });
         socket.on('join', function(data) {
           console.log('join', data);
+          const { token, gotMatch } = data;
+          setToken(token);
+          setGameCreated(true);
+          setMatched(gotMatch);
         });
         socket.on('leave', function(data) {
           console.log('leave', data);
         });
         socket.on('message', (data) => handleMessage(messages, data));
 
-        socket.emit('join', { token: gameRes })
-
-        setSocket(socket);
+        // Join game
+        // socket.emit('join', { token: gameRes })
+        socket.emit('join', { role: role })
 
         return () => {
           socket.off('connect');
@@ -138,6 +128,7 @@ function Game() {
         console.log(err);
       }
     })();
+
 
   }, []);
 
@@ -159,7 +150,7 @@ function Game() {
       <div className="game-container">
         <ChatWindow messagesList={messages} />
         <div className='input-container'>
-          <ChatComposer submitted={submitQuery} canQuery={canQuery()} gameCreated={gameCreated} maxLength={maxLength} />
+          <ChatComposer submitted={submitMessage} canQuery={canQuery()} gameCreated={gameCreated} maxLength={maxLength} />
           {
             investigator &&
             <div>{results == null ? (

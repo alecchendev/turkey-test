@@ -12,8 +12,8 @@ class Game(db.Model):
     start_time = db.Column(db.Integer, nullable=False, default=int(time.time()))
     queries = db.Column(db.Integer, nullable=False, default=0)
     responses = db.Column(db.Integer, nullable=False, default=0)
-    has_investigator = db.Column(db.Boolean, nullable=False, default=False)
-    has_responder = db.Column(db.Boolean, nullable=False, default=False)
+    investigator_id = db.Column(db.String(32), nullable=False, default='')
+    responder_id = db.Column(db.String(32), nullable=False, default='')
 
     def __repr__(self):
         return '<Game %r>' % self.token
@@ -45,14 +45,18 @@ class Scoreboard(db.Model):
 def get_scoreboard(name):
     return Scoreboard.query.filter_by(name=name).first()
 
-def add_new_game(db, token, type, has_responder, has_investigator):
-    game = Game(token=token, type=type, has_responder=has_responder, has_investigator=has_investigator)
+def add_new_game(db, token, type, responder_id, investigator_id):
+    game = Game(token=token, type=type, responder_id=responder_id, investigator_id=investigator_id)
     db.session.add(game)
     db.session.commit()
 
-def get_game(token):
-    game = Game.query.filter_by(token=token).first()
-    return game
+def get_game(token=None, player_id=None):
+    assert token is not None or player_id is not None
+    if token is not None:
+        return Game.query.filter_by(token=token).first()
+    
+    # Get game with player_id as investigator or responder
+    return Game.query.filter((Game.investigator_id == player_id) | (Game.responder_id == player_id)).first()
 
 def increment_queries(db, game):
     game.queries += 1
