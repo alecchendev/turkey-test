@@ -39,7 +39,13 @@ function Game() {
     }
 
     const updatedMessages = [...messages, { text: message, type: "query" }];
-    const query = updatedMessages.map((message) => message.text).join("\n\n");
+    // const query = updatedMessages.map((message) => message.text).join("\n\n");
+    const query = updatedMessages.map((message) => {
+      if (message.type === "query") {
+        return "A: " + message.text;
+      }
+      return "B: " + message.text;
+    }).join("\n");
 
     // display query message
     setGettingQuery(true);

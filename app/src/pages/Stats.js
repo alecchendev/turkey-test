@@ -13,15 +13,15 @@ function Stats() {
     const stats = cookies.stats;
     const total = stats.investigator.ai_right + stats.investigator.ai_wrong + stats.investigator.human_right + stats.investigator.human_wrong;
     if (total !== 0) {
-      win_rate = (stats.investigator.ai_right + stats.investigator.human_right) / total;
+      win_rate = (stats.investigator.ai_right + stats.investigator.human_right) / total * 100;
     }
     const ai_total = stats.investigator.ai_right + stats.investigator.ai_wrong;
     if (ai_total !== 0) {
-      ai_win_rate = stats.investigator.ai_right / ai_total;
+      ai_win_rate = stats.investigator.ai_right / ai_total * 100;
     }
     const human_total = stats.investigator.human_right + stats.investigator.human_wrong;
     if (human_total !== 0) {
-      human_win_rate = stats.investigator.human_right / human_total;
+      human_win_rate = stats.investigator.human_right / human_total * 100;
     }
   }
 
@@ -38,9 +38,9 @@ function Stats() {
         <div className="stats-body">
           <div>
             <div>
-              Overall win rate: {win_rate}%<br/>
-              AI win rate: {ai_win_rate}%<br/>
-              Human win rate: {human_win_rate}%
+              Overall win rate: {Math.round(win_rate)}%<br/>
+              AI win rate: {Math.round(ai_win_rate)}%<br/>
+              Human win rate: {Math.round(human_win_rate)}%
             </div>
             <Scoreboard {...cookies.stats.investigator} title={'Investigator Stats'}/>
           </div>
@@ -48,18 +48,22 @@ function Stats() {
           <div>
             <h2>Responder Stats</h2>
             <table>
-              <tr>
-                <th>Category</th>
-                <th>Score</th>
-              </tr>
-              <tr>
-                <td>Helped Human</td>
-                <td>{cookies.stats.responder.helped}</td>
-              </tr>
-              <tr>
-                <td>Fooled Human</td>
-                <td>{cookies.stats.responder.fooled}</td>
-              </tr>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Helped Human</td>
+                  <td>{cookies.stats.responder.helped}</td>
+                </tr>
+                <tr>
+                  <td>Fooled Human</td>
+                  <td>{cookies.stats.responder.fooled}</td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>

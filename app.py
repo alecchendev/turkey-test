@@ -57,17 +57,19 @@ def on_disconnect():
         return
     
     token = game.token
-    if game.investigator_id == id:
-        game.investigator_id = 'left'
-        db.session.commit()
-        if game.responder_id in ['', 'left', 'ai']:
-            delete_game(db, game)
-    elif game.responder_id == id:
-        game.responder_id = 'left'
-        db.session.commit()
-        if game.investigator_id in ['', 'left']:
-            delete_game(db, game)
+    # if game.investigator_id == id:
+    #     game.investigator_id = 'left'
+    #     db.session.commit()
+    #     if game.responder_id in ['', 'left', 'ai']:
+    #         delete_game(db, game)
+    # elif game.responder_id == id:
+    #     game.responder_id = 'left'
+    #     db.session.commit()
+    #     if game.investigator_id in ['', 'left']:
+    #         delete_game(db, game)
     
+    delete_game(db, game)
+
     leave_room(game.token)
     emit('disconnect', {'message': 'left room'}, room=token)
 
@@ -79,8 +81,8 @@ def on_message(data):
     message = data['message']
     full_message = message['text']
     print(full_message)
-    print(full_message.split('\n\n'))
-    latest_message = full_message.split('\n\n')[-1]
+    print(full_message.split('\n'))
+    latest_message = full_message.split('\n')[-1].replace("A: ", "").replace("B: ", "")
     emit('message', {'text': latest_message, 'type': message['type'] }, room=token)
 
     game = get_game(token=token)
@@ -105,12 +107,12 @@ def on_message(data):
 
     # If ai, must be type == query, generate response
     if game.type == 'ai':
-        response = generate_response(message['text']).strip()
-        if response == '' or response[-1] in ['.', '?', '!']:
+        response = generate_response(message['text'] + "\nB:").strip()
+        if response == '' or response[-1] not in ['.', '?', '!']:
             response += "."
         min_response_time = 2
         response_length_time = len(response.split()) / (80 / 60) # words / (avg words per second)
-        response_time_variance = random.randint(-3, 3)
+        response_time_variance = random.randint(-2, 4)
         wait_time = max(0, min_response_time + response_length_time + response_time_variance)
         time.sleep(wait_time)
         emit('message', {'text': response, 'type': 'response'}, room=token)
@@ -190,7 +192,7 @@ def new_game(role):
     investigator_id = request.sid
     add_new_game(db, token, game_type, responder_id, investigator_id)
     # Wait at least a second
-    time.sleep(random.randint(1, 4))
+    time.sleep(random.randint(1, 3))
     return token
 
 def create_token():

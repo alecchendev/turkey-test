@@ -18,7 +18,8 @@ def generate_response_openai(query, model, max_requests=8):
         max_tokens=50, # openai reccomends 150 for chat
         temperature=0.9, # openai reccomends 0.9 for chat
         top_p=1, # openai reccomends 1 for chat
-        stop=['\n']
+        stop=['\n', 'A:', 'B:']
+        # stop=['\n', '.', '?', '!']
     )
     # repeat query if finish reason != stop
     requests = 0
@@ -26,10 +27,10 @@ def generate_response_openai(query, model, max_requests=8):
         res = openai.Completion.create(
             model=model,
             prompt=query,
-            max_tokens=50, # openai reccomends 150 for chat
+            max_tokens=75, # openai reccomends 150 for chat
             temperature=0.9, # openai reccomends 0.9 for chat
             top_p=1, # openai reccomends 1 for chat
-            stop=['\n']
+            stop=['\n', 'A:', 'B:']
         )
         requests += 1
     print("REQUESTS: ", requests)
