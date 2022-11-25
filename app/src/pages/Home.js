@@ -33,9 +33,10 @@ function Home() {
         Hey there! Welcome to Turkey Test!
       </p>
       <p>
-        Ask up to 3 questions to decide whether you're talking to an AI or a human.
-        Or play the human on the other side, answering questions in order to help or fool your
-        fellow human.
+        Get matched up randomly with either a human or AI, and ask
+        up to 3 questions to decide whether you're talking to an AI or a human.
+        Or play the responder on the other side, answering questions
+        in order to help or fool your fellow human.
       </p>
 
       <div className="role-btn-box">
