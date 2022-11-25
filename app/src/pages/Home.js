@@ -38,6 +38,11 @@ function Home() {
         Or play the responder on the other side, answering questions
         in order to help or fool your fellow human.
       </p>
+      <p>
+        If this app doesn't work properly in any way, please contact me at
+        <a href="mailto:alecchendev@gmail.com"> alecchendev@gmail.com</a> or
+        open an issue on <a href="https://github.com/alecchendev/turkey-test">GitHub</a>.
+      </p>
 
       <div className="role-btn-box">
         <Link to="/game/investigator"><button className="start-btn clickable-btn">Play Investigator</button></Link>
