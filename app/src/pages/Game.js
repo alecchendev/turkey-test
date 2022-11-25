@@ -4,12 +4,10 @@ import '../styles/App.css';
 import ChatWindow from "../components/ChatWindow";
 import ChatComposer from "../components/ChatComposer";
 import Button from '../components/Button';
-import { evaluate, socket } from '../api/api';
+import { socket } from '../api/api';
 import toast, { Toaster } from 'react-hot-toast';
 
 const maxLength = 280;
-
-
 
 function Game() {
 

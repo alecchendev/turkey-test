@@ -151,8 +151,7 @@ def get_results(name):
     
     return scoreboard.to_dict()
 
-# Endpoint for creating a new game
-# @app.post('/api/v0/new_game/<role>')
+# Create new game
 def new_game(role):
 
     # Try to join latest game where it's missing your role
