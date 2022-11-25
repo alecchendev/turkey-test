@@ -1,8 +1,8 @@
 import axios from 'axios';
 import io from 'socket.io-client';
 
-const socketUrl = 'http://localhost:5000';
-const api = "http://localhost:5000/api/v0";
+const socketUrl = '/';
+const api = "/api/v0";
 const scoreboardRoute = "/scoreboard";
 
 // Sockets

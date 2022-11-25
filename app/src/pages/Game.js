@@ -100,9 +100,9 @@ function Game() {
     const header = "🦃 Turkey Test\n"
     const convo = messages.map((message) => {
       if (message.type === "query") {
-        return "1: " + message.text;
+        return "A: " + message.text;
       } else if (message.type === "response") {
-        return "2: " + message.text;
+        return "B: " + message.text;
       } else {
         return message.text;
       }
