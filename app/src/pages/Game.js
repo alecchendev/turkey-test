@@ -72,8 +72,6 @@ function Game() {
   }
 
   const handleMessage = (messages, data) => {
-    console.log('message', data);
-    console.log(messages);
     const updatedMessages = [...messages, data];
     setMessages(updatedMessages);
     if (data.type === "query") {
@@ -118,7 +116,10 @@ function Game() {
         socket.emit('join', { role: role })
 
         return () => {
+          socket.disconnect();
+
           socket.off('connect');
+          socket.off('disconnect');
           socket.off('join');
           socket.off('leave');
           socket.off('message');
@@ -147,10 +148,16 @@ function Game() {
         }}
         />
       </div>
+      {!matched &&
+        <>
+          <p className="finding-match">Finding match...</p>
+          <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </>
+      }
       <div className="game-container">
         <ChatWindow messagesList={messages} />
         <div className='input-container'>
-          <ChatComposer submitted={submitMessage} canQuery={canQuery()} gameCreated={gameCreated} maxLength={maxLength} />
+          <ChatComposer submitted={submitMessage} canQuery={canQuery()} matched={matched} maxLength={maxLength} />
           {
             investigator &&
             <div>{results == null ? (

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Button from "./Button";
 
-function ChatComposer({ submitted, canQuery, gameCreated, maxLength }) {
+function ChatComposer({ submitted, canQuery, matched, maxLength }) {
   const [ newMessage, setNewMessage ] = useState("");
 
   const handleChange = (event) => {
@@ -19,7 +19,7 @@ function ChatComposer({ submitted, canQuery, gameCreated, maxLength }) {
       <form onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder={gameCreated ? "Type your message here" : "Creating new game..."}
+          placeholder={matched ? "Type your message here" : "Finding match..."}
           onChange={handleChange}
           value={newMessage}
           disabled={!canQuery}
