@@ -161,31 +161,43 @@ def get_results(name):
 # Create new game
 def new_game(role):
 
-    # Try to join latest game where it's missing your role
-    game = (Game.query.filter_by(responder_id='').order_by(Game.start_time.desc()).first()
-        if role == 'responder' else Game.query.filter_by(investigator_id='').order_by(Game.start_time.desc()).first())
-    if game is not None:
-        game.responder_id = request.sid if role == 'responder' else game.responder_id
-        game.investigator_id = request.sid if role == 'investigator' else game.investigator_id
-        db.session.commit()
-        return game.token
-
-    # If can't join game, create new game
-    token = create_token()
+    # If role is responder, check if there is an available game
     if role == 'responder':
+        game = Game.query.filter_by(responder_id='').order_by(Game.start_time.asc()).first()
+        if game is not None:
+            game.responder_id = request.sid
+            db.session.commit()
+            return game.token
+        # Create new game
+        token = create_token()
         game_type = "human"
         responder_id = request.sid
         investigator_id = ''
         add_new_game(db, token, game_type, responder_id, investigator_id)
         return token
     
-    # investigator
-    game_type = "ai"
+    # Randomly decide ai or human
+    game_type = random.choice(['ai', 'human'])
+    if game_type == 'human':
+        game = Game.query.filter_by(investigator_id='').order_by(Game.start_time.asc()).first()
+        if game is not None:
+            game.investigator_id = request.sid
+            db.session.commit()
+            return game.token
+        # Create new game
+        token = create_token()
+        responder_id = ''
+        investigator_id = request.sid
+        add_new_game(db, token, game_type, responder_id, investigator_id)
+        return token
+
+    # game type is ai
+    token = create_token()
     responder_id = 'ai'
     investigator_id = request.sid
     add_new_game(db, token, game_type, responder_id, investigator_id)
     # Wait at least a second
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(1, 4))
     return token
 
 def create_token():
