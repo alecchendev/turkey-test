@@ -10,7 +10,7 @@ def generate_response(query):
     return generate_response_openai(query, 'text-davinci-001')
     # return generate_response_transformer(query)
 
-def generate_response_openai(query, model, max_requests=8):
+def generate_response_openai(query, model, max_requests=4):
     # gpt3 ada
     res = openai.Completion.create(
         model=model,
@@ -33,7 +33,7 @@ def generate_response_openai(query, model, max_requests=8):
             stop=['\n', 'A:', 'B:']
         )
         requests += 1
-    print("REQUESTS: ", requests)
+
     response = res['choices'][0]['text']
     return response
 

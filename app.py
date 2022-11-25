@@ -56,20 +56,13 @@ def on_disconnect():
     if game is None:
         return
     
-    token = game.token
-    # if game.investigator_id == id:
-    #     game.investigator_id = 'left'
-    #     db.session.commit()
-    #     if game.responder_id in ['', 'left', 'ai']:
-    #         delete_game(db, game)
-    # elif game.responder_id == id:
-    #     game.responder_id = 'left'
-    #     db.session.commit()
-    #     if game.investigator_id in ['', 'left']:
-    #         delete_game(db, game)
-    
-    delete_game(db, game)
+    if game.responder_id == id and game.responses == 3:
+        game.responder_id = 'left'
+        db.session.commit()
+        return
 
+    token = game.token
+    delete_game(db, game)
     leave_room(game.token)
     emit('disconnect', {'message': 'left room'}, room=token)
 
@@ -80,8 +73,6 @@ def on_message(data):
     token = data['token']
     message = data['message']
     full_message = message['text']
-    print(full_message)
-    print(full_message.split('\n'))
     latest_message = full_message.split('\n')[-1].replace("A: ", "").replace("B: ", "")
     emit('message', {'text': latest_message, 'type': message['type'] }, room=token)
 
@@ -124,7 +115,6 @@ def on_evaluation(data):
     token = data['token']
     evaluation = data['evaluation']
     game = get_game(token=token)
-    print("HANDLING EVALUATE\n\n\n")
 
     # Reject request if game does not exist
     if game is None:
@@ -134,9 +124,12 @@ def on_evaluation(data):
     # Reject request if evaluation is not valid
     if evaluation not in ['ai', 'human']:
         emit('evaluate', {'error': 'Evaluation must be "ai" or "human"'}, room=token)
+        return
     
     # Update score
     update_scoreboard(db, 'basic', evaluation, game.type)
+
+    # Save results
     results = game.type
 
     # Delete game
@@ -197,40 +190,6 @@ def new_game(role):
 
 def create_token():
     return secrets.token_hex(16)
-
-
-# Endpoint to submit evaluation for a game
-@app.post('/api/v0/evaluate')
-def evaluate():
-    # Get token
-    args = request.args
-    token = args.get('token')
-
-    # Get game from database
-    game = get_game(token=token)
-
-    # Reject request if game does not exist
-    if game is None:
-        return 'Game does not exist', 400
-
-    # Reject request if game has less than 1 query
-    if game.queries < 1:
-        return 'Must query once before evaluating', 400
-    
-    # Reject request if evaluation not equal to "ai" or "human"
-    evaluation = args.get('e')
-    if evaluation != 'ai' and evaluation != 'human':
-        return 'Evaluation must be "ai" or "human"', 400
-    
-    # Update scoreboard 'basic' depending if evaluation matches type of game
-    update_scoreboard(db, 'basic', evaluation, game.type)
-    
-    # Delete game from database
-    delete_game(db, game)
-
-    # Return response
-    return game.type
-
 
 if __name__ == '__main__':
     socketio.run(app, use_reloader=True, port=5000, threaded=True)
