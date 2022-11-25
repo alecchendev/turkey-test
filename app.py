@@ -13,7 +13,6 @@ app = Flask(__name__, static_folder='app/build')
 CORS(app) # Enable CORS
 
 # Configure socketio
-app.config['SECRET_KEY'] = 'secret!'                                            
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Initialize database with app
@@ -76,7 +75,11 @@ def on_disconnect():
 def on_message(data):
     token = data['token']
     message = data['message']
-    emit('message', message, room=token)
+    full_message = message['text']
+    print(full_message)
+    print(full_message.split('\n\n'))
+    latest_message = full_message.split('\n\n')[-1]
+    emit('message', {'text': latest_message, 'type': message['type'] }, room=token)
 
     game = get_game(token=token)
 
@@ -100,7 +103,7 @@ def on_message(data):
 
     # If ai, must be type == query, generate response
     if game.type == 'ai':
-        response = generate_response(message['text'])
+        response = generate_response(message['text']).strip()
         emit('message', {'text': response, 'type': 'response'}, room=token)
         increment_responses(db, get_game(token=token))
 

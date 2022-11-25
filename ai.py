@@ -6,8 +6,8 @@ import openai
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_response(query):
-    # return generate_response_openai(query, 'text-ada-001')
-    return generate_response_transformer(query)
+    return generate_response_openai(query, 'text-ada-001')
+    # return generate_response_transformer(query)
 
 def generate_response_openai(query, model):
     # gpt3 ada

@@ -36,12 +36,15 @@ function Game() {
       message += ".";
     }
 
+    const updatedMessages = [...messages, { text: message, type: "query" }];
+    const query = updatedMessages.map((message) => message.text).join("\n\n");
+
     // display query message
     setGettingQuery(true);
 
     // send to human
     const messageType = responder ? "response" : "query";
-    socket.emit('message', { token: token, message: { text: message, type: messageType } });
+    socket.emit('message', { token: token, message: { text: query, type: messageType } });
   };
 
   const canQuery = () => {
@@ -68,6 +71,7 @@ function Game() {
   }
 
   const handleMessage = (messages, data) => {
+    data['text'] = data['text'].trim();
     const updatedMessages = [...messages, data];
     setMessages(updatedMessages);
     if (data.type === "query") {
@@ -113,7 +117,7 @@ function Game() {
           }
           setSubmitted(true);
           setResults(data);
-          if (investigator) {
+          if (investigator === true) {
             if (data.evaluation === data.results) {
               toast.success("Correct!");
             } else {
