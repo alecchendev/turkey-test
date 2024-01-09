@@ -7,7 +7,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_response(query):
     # return generate_response_openai(query, 'text-ada-001')
-    return generate_response_openai(query, 'text-davinci-001')
+    return generate_response_openai(query, 'text-davinci-003')
     # return generate_response_transformer(query)
 
 def generate_response_openai(query, model, max_requests=4):

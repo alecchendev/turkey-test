@@ -104,7 +104,7 @@ def on_message(data):
         min_response_time = 2
         response_length_time = len(response.split()) / (80 / 60) # words / (avg words per second)
         response_time_variance = random.randint(-2, 4)
-        wait_time = max(0, min_response_time + response_length_time + response_time_variance)
+        wait_time = max(0, min_response_time + response_length_time + response_time_variance) / 3
         time.sleep(wait_time)
         emit('message', {'text': response, 'type': 'response'}, room=token)
         increment_responses(db, get_game(token=token))
@@ -197,7 +197,7 @@ def new_game(role):
     investigator_id = request.sid
     add_new_game(db, token, game_type, responder_id, investigator_id)
     # Wait at least a second
-    time.sleep(random.randint(1, 4))
+    time.sleep(random.randint(1, 4) / 2)
     return token
 
 def create_token():
